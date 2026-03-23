@@ -47,7 +47,7 @@ func getNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, reg)
 }
 
-func listNotificationsHandler(w http.ResponseWriter, r *http.Request) {
+func listNotificationsHandler(w http.ResponseWriter, _ *http.Request) {
 	result := make([]NotificationRegistration, 0, len(notifications))
 	for _, reg := range notifications {
 		result = append(result, reg)
