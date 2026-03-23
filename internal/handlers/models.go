@@ -13,3 +13,10 @@ type NotificationRegistration struct {
 	Event     string           `json:"event"`
 	Threshold *ThresholdConfig `json:"threshold,omitempty"` // only for THRESHOLD events
 }
+
+type WebhookPayload struct {
+	ID      string `json:"id"`
+	Country string `json:"country"`
+	Event   string `json:"event"`
+	Time    string `json:"time"`
+}
