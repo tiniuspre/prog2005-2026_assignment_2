@@ -11,7 +11,7 @@ import (
 // temporary map (pre firebase)
 var notifications = map[string]NotificationRegistration{}
 
-func createNotificationHandler(w http.ResponseWriter, r *http.Request) {
+func CreateNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	var reg NotificationRegistration
 	if err := json.NewDecoder(r.Body).Decode(&reg); err != nil {
 		writeError(w, http.StatusBadRequest, "invalid request body")
@@ -36,7 +36,7 @@ func createNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusCreated, reg)
 }
 
-func getNotificationHandler(w http.ResponseWriter, r *http.Request) {
+func GetNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	reg, ok := notifications[id]
 	if !ok {
@@ -47,7 +47,7 @@ func getNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, reg)
 }
 
-func listNotificationsHandler(w http.ResponseWriter, _ *http.Request) {
+func ListNotificationsHandler(w http.ResponseWriter, _ *http.Request) {
 	result := make([]NotificationRegistration, 0, len(notifications))
 	for _, reg := range notifications {
 		result = append(result, reg)
@@ -55,13 +55,21 @@ func listNotificationsHandler(w http.ResponseWriter, _ *http.Request) {
 	writeJSON(w, http.StatusOK, result)
 }
 
-func deleteNotificationHandler(w http.ResponseWriter, r *http.Request) {
+func DeleteNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
-	if _, ok := notifications[id]; !ok {
+	reg, ok := notifications[id]
+	if !ok {
 		writeError(w, http.StatusNotFound, "notification not found")
 		return
 	}
 	delete(notifications, id)
+
+	go Send(reg.URL, WebhookPayload{
+		ID:      reg.ID,
+		Country: reg.Country,
+		Event:   "DELETE",
+		Time:    time.Now().Format("20060102 15:04"),
+	})
 
 	writeJSON(w, http.StatusNoContent, nil)
 }
