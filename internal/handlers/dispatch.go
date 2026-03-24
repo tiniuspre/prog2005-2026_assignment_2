@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"assignment_2/internal/models"
 	"bytes"
 	"encoding/json"
 	"log"
@@ -8,7 +9,7 @@ import (
 	"time"
 )
 
-func Send(url string, payload WebhookPayload) {
+func Send(url string, payload models.WebhookPayload) {
 	body, _ := json.Marshal(payload)
 
 	client := &http.Client{Timeout: 5 * time.Second}

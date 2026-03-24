@@ -1,4 +1,4 @@
-package handlers
+package models
 
 type ThresholdConfig struct {
 	Field    string  `json:"field"`

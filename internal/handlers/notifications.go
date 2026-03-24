@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"assignment_2/internal/models"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -9,10 +10,10 @@ import (
 )
 
 // temporary map (pre firebase)
-var notifications = map[string]NotificationRegistration{}
+var notifications = map[string]models.NotificationRegistration{}
 
 func CreateNotificationHandler(w http.ResponseWriter, r *http.Request) {
-	var reg NotificationRegistration
+	var reg models.NotificationRegistration
 	if err := json.NewDecoder(r.Body).Decode(&reg); err != nil {
 		writeError(w, http.StatusBadRequest, "invalid request body")
 		return
@@ -48,7 +49,7 @@ func GetNotificationHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func ListNotificationsHandler(w http.ResponseWriter, _ *http.Request) {
-	result := make([]NotificationRegistration, 0, len(notifications))
+	result := make([]models.NotificationRegistration, 0, len(notifications))
 	for _, reg := range notifications {
 		result = append(result, reg)
 	}
@@ -64,7 +65,7 @@ func DeleteNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	delete(notifications, id)
 
-	go Send(reg.URL, WebhookPayload{
+	go Send(reg.URL, models.WebhookPayload{
 		ID:      reg.ID,
 		Country: reg.Country,
 		Event:   "DELETE",
