@@ -56,6 +56,7 @@ func GetWeather(latitude, longitude float64) (*MeteoResult, error) {
 }
 
 // mean calculates the average of a float64 slice, returns 0 if empty
+// ALSO USED IN openaq.go NB!
 func mean(values []float64) float64 {
 	if len(values) == 0 {
 		return 0
