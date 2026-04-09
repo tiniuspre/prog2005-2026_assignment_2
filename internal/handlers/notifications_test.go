@@ -90,7 +90,11 @@ func TestCreateNotificationHandler(t *testing.T) {
 func TestCreateNotificationHandler_ResponseBody(t *testing.T) {
 	resetNotifications()
 
-	reg := models.NotificationRegistration{URL: "http://example.com", Country: "NO", Event: "REGISTER"}
+	reg := models.NotificationRegistration{
+		URL:     "http://example.com",
+		Country: "NO",
+		Event:   "REGISTER"}
+
 	var buf bytes.Buffer
 	_ = json.NewEncoder(&buf).Encode(reg)
 
@@ -119,8 +123,10 @@ func TestGetNotificationHandler(t *testing.T) {
 	resetNotifications()
 
 	notifications["abc123"] = models.NotificationRegistration{
-		ID: "abc123", URL: "http://example.com", Country: "NO", Event: "REGISTER",
-	}
+		ID:      "abc123",
+		URL:     "http://example.com",
+		Country: "NO",
+		Event:   "REGISTER"}
 
 	t.Run("existing id", func(t *testing.T) {
 		req := httptest.NewRequest(http.MethodGet, "/notifications/abc123", nil)
