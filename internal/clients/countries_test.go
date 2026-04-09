@@ -102,3 +102,102 @@ func TestGetCountry(t *testing.T) {
 		})
 	}
 }
+
+func TestGetCountryByName(t *testing.T) {
+	tests := []struct {
+		name        string
+		countryName string
+		mockBody    interface{}
+		mockStatus  int
+		wantName    string
+		wantCode    string
+		wantErr     bool
+	}{
+		{
+			name:        "valid country",
+			countryName: "Norway",
+			mockBody: []map[string]interface{}{
+				{
+					"name":    map[string]interface{}{"common": "Norway"},
+					"cca2":    "NO",
+					"capital": []interface{}{"Oslo"},
+					"latlng":  []interface{}{float64(62.0), float64(10.0)},
+				},
+			},
+			mockStatus: http.StatusOK,
+			wantName:   "Norway",
+			wantCode:   "NO",
+			wantErr:    false,
+		},
+		{
+			name:        "name with spaces",
+			countryName: "New Zealand",
+			mockBody: []map[string]interface{}{
+				{
+					"name": map[string]interface{}{
+						"common": "New Zealand"},
+					"cca2":   "NZ",
+					"latlng": []interface{}{float64(-41.0), float64(174.0)},
+				},
+			},
+			mockStatus: http.StatusOK,
+			wantName:   "New Zealand",
+			wantCode:   "NZ",
+			wantErr:    false,
+		},
+		{
+			name:        "country not found",
+			countryName: "Fakeland",
+			mockBody:    nil,
+			mockStatus:  http.StatusNotFound,
+			wantErr:     true,
+		},
+		{
+			name:        "empty results",
+			countryName: "Norway",
+			mockBody:    []map[string]interface{}{},
+			mockStatus:  http.StatusOK,
+			wantErr:     true,
+		},
+		{
+			name:        "API error",
+			countryName: "Norway",
+			mockBody:    nil,
+			mockStatus:  http.StatusInternalServerError,
+			wantErr:     true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(tt.mockStatus)
+				if tt.mockBody != nil {
+					_ = json.NewEncoder(w).Encode(tt.mockBody)
+				}
+			}))
+			defer server.Close()
+
+			restCountriesAPI = server.URL + "/"
+
+			result, err := GetCountryByName(tt.countryName)
+
+			if tt.wantErr && err == nil {
+				t.Error("expected error but got none")
+				return
+			}
+			if !tt.wantErr {
+				if err != nil {
+					t.Errorf("unexpected error: %v", err)
+					return
+				}
+				if result.Name != tt.wantName {
+					t.Errorf("Name: got %s, want %s", result.Name, tt.wantName)
+				}
+				if result.Code != tt.wantCode {
+					t.Errorf("Code: got %s, want %s", result.Code, tt.wantCode)
+				}
+			}
+		})
+	}
+}

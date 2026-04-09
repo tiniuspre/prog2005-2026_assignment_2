@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"strings"
 )
 
@@ -18,6 +19,38 @@ func GetCountry(countryCode string) (*models.Country, error) {
 	countryCode = strings.ToUpper(countryCode)
 
 	url := restCountriesAPI + "alpha/" + countryCode
+
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch country data: %w", err)
+	}
+	defer func() { _ = resp.Body.Close() }()
+
+	if resp.StatusCode == http.StatusNotFound {
+		return nil, errors.New("country not found")
+	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("API returned status %d", resp.StatusCode)
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read response body: %w", err)
+	}
+
+	var rawCountries []map[string]interface{}
+	if err := json.Unmarshal(body, &rawCountries); err != nil {
+		return nil, fmt.Errorf("failed to parse response: %w", err)
+	}
+	if len(rawCountries) == 0 {
+		return nil, errors.New("no country data found")
+	}
+
+	return mapToCountry(rawCountries[0])
+}
+
+func GetCountryByName(countryName string) (*models.Country, error) {
+	url := restCountriesAPI + "name/" + url.PathEscape(countryName)
 
 	resp, err := http.Get(url)
 	if err != nil {
