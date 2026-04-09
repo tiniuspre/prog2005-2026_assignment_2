@@ -185,8 +185,16 @@ func TestListNotificationsHandler(t *testing.T) {
 
 	t.Run("returns all entries", func(t *testing.T) {
 		resetNotifications()
-		notifications["1"] = models.NotificationRegistration{ID: "1", URL: "http://a.com", Country: "NO", Event: "REGISTER"}
-		notifications["2"] = models.NotificationRegistration{ID: "2", URL: "http://b.com", Country: "SE", Event: "DELETE"}
+
+		notifications["1"] = models.NotificationRegistration{ID: "1",
+			URL:     "http://a.com",
+			Country: "NO",
+			Event:   "REGISTER"}
+
+		notifications["2"] = models.NotificationRegistration{ID: "2",
+			URL:     "http://b.com",
+			Country: "SE",
+			Event:   "DELETE"}
 
 		req := httptest.NewRequest(http.MethodGet, "/notifications", nil)
 		w := httptest.NewRecorder()
@@ -228,7 +236,10 @@ func TestDeleteNotificationHandler(t *testing.T) {
 		defer webhook.Close()
 
 		notifications["del1"] = models.NotificationRegistration{
-			ID: "del1", URL: webhook.URL, Country: "NO", Event: "REGISTER",
+			ID:      "del1",
+			URL:     webhook.URL,
+			Country: "NO",
+			Event:   "REGISTER",
 		}
 
 		req := httptest.NewRequest(http.MethodDelete, "/notifications/del1", nil)
