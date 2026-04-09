@@ -1,5 +1,12 @@
 package models
 
+type ThresholdDetails struct {
+	Field         string  `json:"field"`
+	Operator      string  `json:"operator"`
+	Threshold     float64 `json:"threshold"`
+	MeasuredValue float64 `json:"measuredValue"`
+}
+
 type ThresholdConfig struct {
 	Field    string  `json:"field"`
 	Operator string  `json:"operator"`
@@ -15,8 +22,9 @@ type NotificationRegistration struct {
 }
 
 type WebhookPayload struct {
-	ID      string `json:"id"`
-	Country string `json:"country"`
-	Event   string `json:"event"`
-	Time    string `json:"time"`
+	ID      string            `json:"id"`
+	Country string            `json:"country"`
+	Event   string            `json:"event"`
+	Time    string            `json:"time"`
+	Details *ThresholdDetails `json:"details,omitempty"` // only for THRESHOLD events
 }
