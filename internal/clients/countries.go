@@ -23,7 +23,7 @@ func GetCountry(countryCode string) (*models.Country, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch country data: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode == http.StatusNotFound {
 		return nil, errors.New("country not found")

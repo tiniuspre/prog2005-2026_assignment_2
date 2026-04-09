@@ -19,7 +19,7 @@ func GetExchangeRates(baseCurrency string, targetCurrencies []string) (map[strin
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch exchange rates: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("currency API returned status %d", resp.StatusCode)
