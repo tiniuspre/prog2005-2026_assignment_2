@@ -85,7 +85,7 @@ func TestGetAirQuality(t *testing.T) {
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(tt.mockStatus)
 				if tt.mockBody != nil {
-					json.NewEncoder(w).Encode(tt.mockBody)
+					_ = json.NewEncoder(w).Encode(tt.mockBody)
 				}
 			}))
 			defer server.Close()

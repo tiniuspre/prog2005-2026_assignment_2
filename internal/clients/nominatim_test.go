@@ -45,7 +45,7 @@ func TestGetCapitalCoordinates(t *testing.T) {
 			// Spin up a fake Nominatim server
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(tt.mockStatus)
-				json.NewEncoder(w).Encode(tt.mockBody)
+				_ = json.NewEncoder(w).Encode(tt.mockBody)
 			}))
 			defer server.Close()
 
