@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"time"
 )
 
@@ -21,6 +22,12 @@ func CreateNotificationHandler(w http.ResponseWriter, r *http.Request) {
 
 	if reg.URL == "" || reg.Country == "" || reg.Event == "" {
 		writeError(w, http.StatusBadRequest, "url, country and event are required")
+		return
+	}
+
+	u, err := url.Parse(reg.URL)
+	if err != nil || (u.Scheme != "http" && u.Scheme != "https") || u.Host == "" {
+		writeError(w, http.StatusBadRequest, "url must be a valid http or https URL")
 		return
 	}
 
@@ -72,7 +79,7 @@ func DeleteNotificationHandler(w http.ResponseWriter, r *http.Request) {
 		Time:    time.Now().Format("20060102 15:04"),
 	})
 
-	writeJSON(w, http.StatusNoContent, nil)
+	w.WriteHeader(http.StatusNoContent)
 }
 
 // --------- HELPER FUNCTIONS ---------
