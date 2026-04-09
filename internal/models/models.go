@@ -50,3 +50,28 @@ type WebhookPayload struct {
 	Time    string            `json:"time"`
 	Details *ThresholdDetails `json:"details,omitempty"` // only for THRESHOLD events
 }
+
+// DASHBOARD
+type AirQualityData struct {
+	PM25  float64 `json:"pm25"`
+	PM10  float64 `json:"pm10"`
+	Level string  `json:"level"`
+}
+
+type DashboardFeatures struct {
+	Temperature      *float64           `json:"temperature,omitempty"`
+	Precipitation    *float64           `json:"precipitation,omitempty"`
+	AirQuality       *AirQualityData    `json:"airQuality,omitempty"`
+	Capital          *string            `json:"capital,omitempty"`
+	Coordinates      *Coordinates       `json:"coordinates,omitempty"`
+	Population       *int64             `json:"population,omitempty"`
+	Area             *float64           `json:"area,omitempty"`
+	TargetCurrencies map[string]float64 `json:"targetCurrencies,omitempty"`
+}
+
+type DashboardResponse struct {
+	Country       string            `json:"country"`
+	IsoCode       string            `json:"isoCode"`
+	Features      DashboardFeatures `json:"features"`
+	LastRetrieval string            `json:"lastRetrieval"`
+}
