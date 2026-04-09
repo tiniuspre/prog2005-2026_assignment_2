@@ -40,7 +40,7 @@ func GetCapitalCoordinates(capital, country string) (*models.Coordinates, error)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch coordinates: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("nominatim returned status: %d", resp.StatusCode)

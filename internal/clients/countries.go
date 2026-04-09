@@ -10,8 +10,8 @@ import (
 	"strings"
 )
 
-// TODO create folder/file for consts
-const restCountriesAPI = "http://129.241.150.113:8080/v3.1/"
+// TODO create folder/file for consts - var for testing purposes
+var restCountriesAPI = "http://129.241.150.113:8080/v3.1/"
 
 // GetCountry fetches data from the Countries API by ISO code
 func GetCountry(countryCode string) (*models.Country, error) {
@@ -23,7 +23,7 @@ func GetCountry(countryCode string) (*models.Country, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch country data: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode == http.StatusNotFound {
 		return nil, errors.New("country not found")

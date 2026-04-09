@@ -10,13 +10,13 @@ import (
 // var instead of const so tests can override with local httptest.Server URL
 var meteoBaseURL = "https://api.meteo.com/v1"
 
-// Used by daashboard, needs temperature and precipation numbers
+// Used by dashboard, needs temperature and precipitation numbers
 type MeteoResult struct {
-	Temperature float64
-	Precipation float64
+	Temperature   float64
+	Precipitation float64
 }
 
-// GetWeather fetches mean forecast temperature and precipation for given coordinates
+// GetWeather fetches mean forecast temperature and precipitation for given coordinates
 func GetWeather(latitude, longitude float64) (*MeteoResult, error) {
 	url := fmt.Sprintf(
 		"%s/forecast?latitude=%f&longitude=%f&hourly=temperature_2m,precipitation",
@@ -27,7 +27,7 @@ func GetWeather(latitude, longitude float64) (*MeteoResult, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch weather data: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("meteo API returned status %d", resp.StatusCode)
@@ -50,8 +50,8 @@ func GetWeather(latitude, longitude float64) (*MeteoResult, error) {
 	}
 
 	return &MeteoResult{
-		Temperature: mean(response.Hourly.Temperature),
-		Precipation: mean(response.Hourly.Precipitation),
+		Temperature:   mean(response.Hourly.Temperature),
+		Precipitation: mean(response.Hourly.Precipitation),
 	}, nil
 }
 

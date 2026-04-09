@@ -47,7 +47,7 @@ func GetAirQuality(latitude, longitude float64) (*AirQualityResult, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch air quality data: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("openaq API returned status %d", resp.StatusCode)

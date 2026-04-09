@@ -8,8 +8,8 @@ import (
 	"strings"
 )
 
-// TODO create folder/file for consts
-const currencyAPI = "http://129.241.150.113:9090/currency/"
+// TODO create folder/file for consts - var for testing purposes
+var currencyAPI = "http://129.241.150.113:9090/currency/"
 
 // GetExchangeRates fetches exchange rates from a base currency to a list of target currencies
 func GetExchangeRates(baseCurrency string, targetCurrencies []string) (map[string]float64, error) {
@@ -19,7 +19,7 @@ func GetExchangeRates(baseCurrency string, targetCurrencies []string) (map[strin
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch exchange rates: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("currency API returned status %d", resp.StatusCode)
