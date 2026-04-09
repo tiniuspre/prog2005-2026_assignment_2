@@ -4,7 +4,6 @@ import (
 	"assignment_2/internal/models"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"net/url"
 	"time"
@@ -79,19 +78,5 @@ func DeleteNotificationHandler(w http.ResponseWriter, r *http.Request) {
 		Time:    time.Now().Format("20060102 15:04"),
 	})
 
-	w.WriteHeader(http.StatusNoContent)
-}
-
-// --------- HELPER FUNCTIONS ---------
-func writeError(w http.ResponseWriter, status int, message string) {
-	writeJSON(w, status, map[string]string{"error": message})
-
-}
-
-func writeJSON(w http.ResponseWriter, status int, data any) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(status)
-	if err := json.NewEncoder(w).Encode(data); err != nil {
-		log.Printf("failed to encode response: %v", err)
-	}
+	w.WriteHeader(http.StatusNoContent) // not using writeJSON since no body
 }
