@@ -9,6 +9,7 @@ import (
 	"testing"
 )
 
+// resetNotifications clears the notifications map to ensure test isolation. It should be called at the start of each test that modifies the map.
 func resetNotifications() {
 	notifications = map[string]models.NotificationRegistration{}
 }
