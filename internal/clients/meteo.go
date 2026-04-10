@@ -8,7 +8,7 @@ import (
 )
 
 // var instead of const so tests can override with local httptest.Server URL
-var meteoBaseURL = "https://api.meteo.com/v1"
+var meteoBaseURL = "https://api.open-meteo.com/v1"
 
 // Used by dashboard, needs temperature and precipitation numbers
 type MeteoResult struct {
