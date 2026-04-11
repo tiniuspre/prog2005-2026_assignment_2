@@ -14,7 +14,11 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to initialise Firestore: %v", err)
 	}
-	defer firestoreClient.Close()
+	defer func() {
+		if err := firestoreClient.Close(); err != nil {
+			log.Printf("failed to close Firestore client: %v", err)
+		}
+	}()
 	handlers.Init(firestoreClient)
 
 	mux := http.NewServeMux()
