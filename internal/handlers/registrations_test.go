@@ -9,9 +9,9 @@ import (
 	"testing"
 )
 
-// resetRegistrations clears the registrations map to ensure test isolation. It should be called at the start of each test that modifies the map.
+// resetRegistrations clears the store to ensure test isolation.
 func resetRegistrations() {
-	registrations = map[string]models.Registration{}
+	store = NewMemoryStore()
 }
 
 func TestCreateRegistrationHandler_Validation(t *testing.T) {
@@ -55,7 +55,7 @@ func TestGetRegistrationHandler(t *testing.T) {
 	t.Run("existing id", func(t *testing.T) {
 		resetRegistrations()
 
-		registrations["reg1"] = models.Registration{
+		memStore().registrations["reg1"] = models.Registration{
 			ID:      "reg1",
 			Country: "Norway",
 			IsoCode: "NO",
@@ -123,8 +123,8 @@ func TestListRegistrationsHandler(t *testing.T) {
 	t.Run("returns all entries", func(t *testing.T) {
 		resetRegistrations()
 
-		registrations["r1"] = models.Registration{ID: "r1", Country: "Norway", IsoCode: "NO"}
-		registrations["r2"] = models.Registration{ID: "r2", Country: "Sweden", IsoCode: "SE"}
+		memStore().registrations["r1"] = models.Registration{ID: "r1", Country: "Norway", IsoCode: "NO"}
+		memStore().registrations["r2"] = models.Registration{ID: "r2", Country: "Sweden", IsoCode: "SE"}
 
 		req := httptest.NewRequest(http.MethodGet, "/registrations", nil)
 		w := httptest.NewRecorder()
@@ -144,7 +144,6 @@ func TestListRegistrationsHandler(t *testing.T) {
 func TestDeleteRegistrationHandler(t *testing.T) {
 	t.Run("unknown id", func(t *testing.T) {
 		resetRegistrations()
-		resetNotifications()
 
 		req := httptest.NewRequest(http.MethodDelete, "/registrations/nope", nil)
 		req.SetPathValue("id", "nope")
@@ -159,9 +158,8 @@ func TestDeleteRegistrationHandler(t *testing.T) {
 
 	t.Run("existing id", func(t *testing.T) {
 		resetRegistrations()
-		resetNotifications()
 
-		registrations["del1"] = models.Registration{ID: "del1", Country: "Norway", IsoCode: "NO"}
+		memStore().registrations["del1"] = models.Registration{ID: "del1", Country: "Norway", IsoCode: "NO"}
 
 		req := httptest.NewRequest(http.MethodDelete, "/registrations/del1", nil)
 		req.SetPathValue("id", "del1")
@@ -172,8 +170,8 @@ func TestDeleteRegistrationHandler(t *testing.T) {
 		if w.Code != http.StatusNoContent {
 			t.Errorf("status: got %d, want %d", w.Code, http.StatusNoContent)
 		}
-		if _, ok := registrations["del1"]; ok {
-			t.Error("expected entry to be removed from map")
+		if _, ok := memStore().registrations["del1"]; ok {
+			t.Error("expected entry to be removed from store")
 		}
 	})
 }
@@ -199,7 +197,7 @@ func TestUpdateRegistrationHandler_Validation(t *testing.T) {
 	t.Run("invalid json body", func(t *testing.T) {
 		resetRegistrations()
 
-		registrations["upd1"] = models.Registration{ID: "upd1", Country: "Norway", IsoCode: "NO"}
+		memStore().registrations["upd1"] = models.Registration{ID: "upd1", Country: "Norway", IsoCode: "NO"}
 
 		var buf bytes.Buffer
 		_ = json.NewEncoder(&buf).Encode("not json")

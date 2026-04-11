@@ -3,6 +3,7 @@ package handlers
 import (
 	"assignment_2/internal/models"
 	"bytes"
+	"context"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -27,7 +28,13 @@ func Send(url string, payload models.WebhookPayload) {
 }
 
 func DispatchEvent(event, country string) {
-	for _, reg := range notifications {
+	regs, err := store.ListNotifications(context.Background())
+	if err != nil {
+		log.Printf("DispatchEvent: failed to list notifications: %v", err)
+		return
+	}
+
+	for _, reg := range regs {
 		if reg.Event != event {
 			continue
 		}
@@ -44,7 +51,13 @@ func DispatchEvent(event, country string) {
 }
 
 func CheckThresholds(country string, values map[string]float64) {
-	for _, reg := range notifications {
+	regs, err := store.ListNotifications(context.Background())
+	if err != nil {
+		log.Printf("CheckThresholds: failed to list notifications: %v", err)
+		return
+	}
+
+	for _, reg := range regs {
 		if reg.Event != "THRESHOLD" || reg.Threshold == nil {
 			continue
 		}

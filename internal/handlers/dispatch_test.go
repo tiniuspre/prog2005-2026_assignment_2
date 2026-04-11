@@ -55,7 +55,7 @@ func TestDispatchEvent(t *testing.T) {
 		}))
 		defer srv.Close()
 
-		notifications["n1"] = models.NotificationRegistration{
+		memStore().notifications["n1"] = models.NotificationRegistration{
 			ID: "n1", URL: srv.URL, Country: "NO", Event: "REGISTER",
 		}
 
@@ -81,7 +81,7 @@ func TestDispatchEvent(t *testing.T) {
 		}))
 		defer srv.Close()
 
-		notifications["n2"] = models.NotificationRegistration{
+		memStore().notifications["n2"] = models.NotificationRegistration{
 			ID: "n2", URL: srv.URL, Country: "NO", Event: "DELETE",
 		}
 
@@ -105,7 +105,7 @@ func TestDispatchEvent(t *testing.T) {
 		}))
 		defer srv.Close()
 
-		notifications["n3"] = models.NotificationRegistration{
+		memStore().notifications["n3"] = models.NotificationRegistration{
 			ID: "n3", URL: srv.URL, Country: "SE", Event: "REGISTER",
 		}
 
@@ -135,7 +135,7 @@ func TestCheckThresholds(t *testing.T) {
 		}))
 		defer srv.Close()
 
-		notifications["t1"] = models.NotificationRegistration{
+		memStore().notifications["t1"] = models.NotificationRegistration{
 			ID:      "t1",
 			URL:     srv.URL,
 			Country: "NO",
@@ -179,7 +179,7 @@ func TestCheckThresholds(t *testing.T) {
 		}))
 		defer srv.Close()
 
-		notifications["t2"] = models.NotificationRegistration{
+		memStore().notifications["t2"] = models.NotificationRegistration{
 			ID:      "t2",
 			URL:     srv.URL,
 			Country: "NO",
@@ -209,7 +209,7 @@ func TestCheckThresholds(t *testing.T) {
 		}))
 		defer srv.Close()
 
-		notifications["t3"] = models.NotificationRegistration{
+		memStore().notifications["t3"] = models.NotificationRegistration{
 			ID:      "t3",
 			URL:     srv.URL,
 			Country: "NO",

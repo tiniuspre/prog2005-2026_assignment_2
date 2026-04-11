@@ -3,13 +3,11 @@ package handlers
 import (
 	"assignment_2/internal/clients"
 	"assignment_2/internal/models"
+	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"time"
 )
-
-var registrations = map[string]models.Registration{}
 
 func CreateRegistrationHandler(w http.ResponseWriter, r *http.Request) {
 	var reg models.Registration
@@ -40,24 +38,30 @@ func CreateRegistrationHandler(w http.ResponseWriter, r *http.Request) {
 		reg.IsoCode = country.Code
 	}
 
-	// temp storage (pre firebase)
-	reg.ID = fmt.Sprintf("%d", time.Now().UnixNano())
 	reg.LastChange = time.Now().Format("20060102 15:04")
 
-	// storing
-	registrations[reg.ID] = reg
+	id, err := store.CreateRegistration(context.Background(), reg)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "failed to create registration")
+		return
+	}
+
 	DispatchEvent("REGISTER", reg.IsoCode)
 
 	writeJSON(w, http.StatusCreated, map[string]string{
-		"id":         reg.ID,
+		"id":         id,
 		"lastChange": reg.LastChange,
 	})
 }
 
 func GetRegistrationHandler(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
-	reg, ok := registrations[id]
-	if !ok {
+	reg, err := store.GetRegistration(context.Background(), id)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "failed to get registration")
+		return
+	}
+	if reg == nil {
 		writeError(w, http.StatusNotFound, "registration not found")
 		return
 	}
@@ -66,32 +70,45 @@ func GetRegistrationHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func ListRegistrationsHandler(w http.ResponseWriter, _ *http.Request) {
-	result := make([]models.Registration, 0, len(registrations))
-	for _, reg := range registrations {
-		result = append(result, reg)
+	regs, err := store.ListRegistrations(context.Background())
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "failed to list registrations")
+		return
 	}
 
-	writeJSON(w, http.StatusOK, result)
+	writeJSON(w, http.StatusOK, regs)
 }
 
 func DeleteRegistrationHandler(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
-	reg, ok := registrations[id]
-	if !ok {
+	reg, err := store.GetRegistration(context.Background(), id)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "failed to get registration")
+		return
+	}
+	if reg == nil {
 		writeError(w, http.StatusNotFound, "registration not found")
 		return
 	}
 
-	DispatchEvent("DELETE", reg.IsoCode)
-	delete(registrations, id)
+	if err := store.DeleteRegistration(context.Background(), id); err != nil {
+		writeError(w, http.StatusInternalServerError, "failed to delete registration")
+		return
+	}
 
-	w.WriteHeader(http.StatusNoContent) // not using writeJSON since no body
+	DispatchEvent("DELETE", reg.IsoCode)
+
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func UpdateRegistrationHandler(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
-	reg, ok := registrations[id]
-	if !ok {
+	reg, err := store.GetRegistration(context.Background(), id)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "failed to get registration")
+		return
+	}
+	if reg == nil {
 		writeError(w, http.StatusNotFound, "registration not found")
 		return
 	}
@@ -120,8 +137,13 @@ func UpdateRegistrationHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	reg.LastChange = time.Now().Format("20060102 15:04")
 	reg.Features = update.Features
-	registrations[id] = reg
+
+	if err := store.UpdateRegistration(context.Background(), *reg); err != nil {
+		writeError(w, http.StatusInternalServerError, "failed to update registration")
+		return
+	}
+
 	DispatchEvent("CHANGE", reg.IsoCode)
 
-	w.WriteHeader(http.StatusOK) // not using writeJSON since no body
+	w.WriteHeader(http.StatusOK)
 }

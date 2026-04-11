@@ -3,14 +3,19 @@ package handlers
 import (
 	"assignment_2/internal/clients"
 	"assignment_2/internal/models"
+	"context"
 	"net/http"
 	"time"
 )
 
 func GetDashboardHandler(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
-	reg, ok := registrations[id]
-	if !ok {
+	reg, err := store.GetRegistration(context.Background(), id)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "failed to get registration")
+		return
+	}
+	if reg == nil {
 		writeError(w, http.StatusNotFound, "registration not found")
 		return
 	}

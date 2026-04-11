@@ -9,9 +9,12 @@ import (
 	"testing"
 )
 
-// resetNotifications clears the notifications map to ensure test isolation. It should be called at the start of each test that modifies the map.
 func resetNotifications() {
-	notifications = map[string]models.NotificationRegistration{}
+	store = NewMemoryStore()
+}
+
+func memStore() *MemoryStore {
+	return store.(*MemoryStore)
 }
 
 func TestCreateNotificationHandler(t *testing.T) {
@@ -123,7 +126,7 @@ func TestCreateNotificationHandler_ResponseBody(t *testing.T) {
 func TestGetNotificationHandler(t *testing.T) {
 	resetNotifications()
 
-	notifications["abc123"] = models.NotificationRegistration{
+	memStore().notifications["abc123"] = models.NotificationRegistration{
 		ID:      "abc123",
 		URL:     "http://example.com",
 		Country: "NO",
@@ -187,15 +190,8 @@ func TestListNotificationsHandler(t *testing.T) {
 	t.Run("returns all entries", func(t *testing.T) {
 		resetNotifications()
 
-		notifications["1"] = models.NotificationRegistration{ID: "1",
-			URL:     "http://a.com",
-			Country: "NO",
-			Event:   "REGISTER"}
-
-		notifications["2"] = models.NotificationRegistration{ID: "2",
-			URL:     "http://b.com",
-			Country: "SE",
-			Event:   "DELETE"}
+		memStore().notifications["1"] = models.NotificationRegistration{ID: "1", URL: "http://a.com", Country: "NO", Event: "REGISTER"}
+		memStore().notifications["2"] = models.NotificationRegistration{ID: "2", URL: "http://b.com", Country: "SE", Event: "DELETE"}
 
 		req := httptest.NewRequest(http.MethodGet, "/notifications", nil)
 		w := httptest.NewRecorder()
@@ -236,7 +232,7 @@ func TestDeleteNotificationHandler(t *testing.T) {
 		}))
 		defer webhook.Close()
 
-		notifications["del1"] = models.NotificationRegistration{
+		memStore().notifications["del1"] = models.NotificationRegistration{
 			ID:      "del1",
 			URL:     webhook.URL,
 			Country: "NO",
@@ -252,8 +248,8 @@ func TestDeleteNotificationHandler(t *testing.T) {
 		if w.Code != http.StatusNoContent {
 			t.Errorf("status: got %d, want %d", w.Code, http.StatusNoContent)
 		}
-		if _, ok := notifications["del1"]; ok {
-			t.Error("expected entry to be removed from map")
+		if _, ok := memStore().notifications["del1"]; ok {
+			t.Error("expected entry to be removed from store")
 		}
 	})
 }

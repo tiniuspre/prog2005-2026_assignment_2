@@ -2,15 +2,12 @@ package handlers
 
 import (
 	"assignment_2/internal/models"
+	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/url"
 	"time"
 )
-
-// temporary map (pre firebase)
-var notifications = map[string]models.NotificationRegistration{}
 
 func CreateNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	var reg models.NotificationRegistration
@@ -35,18 +32,24 @@ func CreateNotificationHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// temp storage (pre firebase)
-	reg.ID = fmt.Sprintf("%d", time.Now().UnixNano())
-	// storing
-	notifications[reg.ID] = reg
+	id, err := store.CreateNotification(context.Background(), reg)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "failed to create notification")
+		return
+	}
+	reg.ID = id
 
 	writeJSON(w, http.StatusCreated, reg)
 }
 
 func GetNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
-	reg, ok := notifications[id]
-	if !ok {
+	reg, err := store.GetNotification(context.Background(), id)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "failed to get notification")
+		return
+	}
+	if reg == nil {
 		writeError(w, http.StatusNotFound, "notification not found")
 		return
 	}
@@ -55,21 +58,31 @@ func GetNotificationHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func ListNotificationsHandler(w http.ResponseWriter, _ *http.Request) {
-	result := make([]models.NotificationRegistration, 0, len(notifications))
-	for _, reg := range notifications {
-		result = append(result, reg)
+	regs, err := store.ListNotifications(context.Background())
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "failed to list notifications")
+		return
 	}
-	writeJSON(w, http.StatusOK, result)
+
+	writeJSON(w, http.StatusOK, regs)
 }
 
 func DeleteNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
-	reg, ok := notifications[id]
-	if !ok {
+	reg, err := store.GetNotification(context.Background(), id)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "failed to get notification")
+		return
+	}
+	if reg == nil {
 		writeError(w, http.StatusNotFound, "notification not found")
 		return
 	}
-	delete(notifications, id)
+
+	if err := store.DeleteNotification(context.Background(), id); err != nil {
+		writeError(w, http.StatusInternalServerError, "failed to delete notification")
+		return
+	}
 
 	go Send(reg.URL, models.WebhookPayload{
 		ID:      reg.ID,
@@ -78,5 +91,5 @@ func DeleteNotificationHandler(w http.ResponseWriter, r *http.Request) {
 		Time:    time.Now().Format("20060102 15:04"),
 	})
 
-	w.WriteHeader(http.StatusNoContent) // not using writeJSON since no body
+	w.WriteHeader(http.StatusNoContent)
 }
