@@ -4,7 +4,16 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+
+	"cloud.google.com/go/firestore"
 )
+
+var store Store
+
+// Init initializes the handlers with a Firestore client.
+func Init(client *firestore.Client) {
+	store = NewFirestoreStore(client)
+}
 
 // Helper functions for writing JSON responses and errors
 func writeError(w http.ResponseWriter, status int, message string) {
