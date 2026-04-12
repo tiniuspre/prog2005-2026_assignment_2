@@ -12,7 +12,7 @@ import (
 
 const apiKeysCollection = "apikeys"
 
-// Data represented that is stored in firebase
+// APIKey Data represented that is stored in firebase
 type APIKey struct {
 	Key       string `firestore:"key"       json:"key"`
 	Name      string `firestore:"name"      json:"name"`
