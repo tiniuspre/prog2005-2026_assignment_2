@@ -29,11 +29,6 @@ func healthCheck(url, userAgent string) int {
 }
 
 func StatusHandler(w http.ResponseWriter, _ *http.Request) {
-	type result struct {
-		key   string
-		value int
-	}
-
 	checks := []struct {
 		key       string
 		url       string
