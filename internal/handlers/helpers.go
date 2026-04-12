@@ -10,11 +10,13 @@ import (
 )
 
 var store Store
+var firestoreClient *firestore.Client
 var startTime = time.Now()
 
 // Init initializes the handlers with a Firestore client.
 func Init(client *firestore.Client) {
 	store = NewFirestoreStore(client)
+	firestoreClient = client
 }
 
 // Helper functions for writing JSON responses and errors
