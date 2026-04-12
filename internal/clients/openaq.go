@@ -1,6 +1,7 @@
 package clients
 
 import (
+	"assignment_2/internal/models"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -9,11 +10,6 @@ import (
 )
 
 var openaqBaseURL = "https://api.openaq.org/v3"
-
-type AirQualityResult struct {
-	PM25  float64 `json:"pm25"`
-	Level string  `json:"level"`
-}
 
 type openaqResponse struct {
 	Results []struct {
@@ -28,10 +24,10 @@ type openaqResponse struct {
 	} `json:"results"`
 }
 
-// GetAirQuality fetches mean PM2.5 readings from stations within 50km of the given coordinates
-func GetAirQuality(latitude, longitude float64) (*AirQualityResult, error) {
+// GetAirQuality fetches mean PM2.5 and PM10 readings from stations within 50km of the given coordinates
+func GetAirQuality(latitude, longitude float64) (*models.AirQualityData, error) {
 	url := fmt.Sprintf(
-		"%s/locations?coordinates=%f,%f&radius=50000&parameters_id=2&limit=100",
+		"%s/locations?coordinates=%f,%f&radius=50000&limit=100",
 		openaqBaseURL, latitude, longitude,
 	)
 
@@ -63,28 +59,33 @@ func GetAirQuality(latitude, longitude float64) (*AirQualityResult, error) {
 		return nil, fmt.Errorf("failed to parse response: %w", err)
 	}
 
-	// Collect PM2.5 readings (parameter ID 2) across all stations
-	var readings []float64
+	var pm25readings, pm10readings []float64
 	for _, location := range response.Results {
 		for _, sensor := range location.Sensors {
-			if sensor.Parameter.ID == 2 && sensor.Latest.Value > 0 {
-				readings = append(readings, sensor.Latest.Value)
+			switch sensor.Parameter.ID {
+			case 2:
+				if sensor.Latest.Value > 0 {
+					pm25readings = append(pm25readings, sensor.Latest.Value)
+				}
+			case 1:
+				if sensor.Latest.Value > 0 {
+					pm10readings = append(pm10readings, sensor.Latest.Value)
+				}
 			}
 		}
 	}
 
-	// No stations found within range
-	if len(readings) == 0 {
-		return &AirQualityResult{
-			PM25:  -1,
-			Level: "unknown",
-		}, nil
+	pm25 := mean(pm25readings) // returns 0 if empty
+	pm10 := mean(pm10readings)
+
+	if len(pm25readings) == 0 {
+		return &models.AirQualityData{PM25: -1, PM10: -1, Level: "unknown"},
+			nil
 	}
 
-	pm25 := mean(readings)
-
-	return &AirQualityResult{
+	return &models.AirQualityData{
 		PM25:  pm25,
+		PM10:  pm10,
 		Level: aqiLevel(pm25),
 	}, nil
 }
