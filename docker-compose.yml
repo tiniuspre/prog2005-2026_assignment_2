@@ -1,0 +1,10 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./secrets/fire-key.json:/app/secrets/fire-key.json:ro
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/secrets/fire-key.json
+      - PORT=8080

@@ -11,7 +11,6 @@ go run .
 # Service starts on http://localhost:8080
 ```
 
-
 ## Firebase setup
 
 1. Download key from:
@@ -28,6 +27,17 @@ export GOOGLE_APPLICATION_CREDENTIALS="../secrets/fire-key.json"
 ```
 
 4. Done
+
+## Docker
+Building and running:
+```bash
+docker compose up --build
+```
+
+If in need of detached / running in the background:
+```bash
+docker compose up --build -d
+```
 
 
 # How to use

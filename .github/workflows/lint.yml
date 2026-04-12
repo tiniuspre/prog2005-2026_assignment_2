@@ -33,3 +33,6 @@ jobs:
       - uses: golangci/golangci-lint-action@v9
         with:
           version: v2.10
+
+      - name: Build Docker image
+        run: docker build -t envdash:ci .
