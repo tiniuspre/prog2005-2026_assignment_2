@@ -29,7 +29,7 @@ func APIKeyAuth(client *firestore.Client, public []PublicRoute) func(http.Handle
 			if key == "" {
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusUnauthorized)
-				w.Write([]byte(`{"error":"missing API key"}`))
+				_, _ = w.Write([]byte(`{"error":"missing API key"}`))
 				return
 			}
 
@@ -37,13 +37,13 @@ func APIKeyAuth(client *firestore.Client, public []PublicRoute) func(http.Handle
 			if err != nil {
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusInternalServerError)
-				w.Write([]byte(`{"error":"failed to validate API key"}`))
+				_, _ = w.Write([]byte(`{"error":"failed to validate API key"}`))
 				return
 			}
 			if ak == nil {
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusForbidden)
-				w.Write([]byte(`{"error":"invalid or revoked API key"}`))
+				_, _ = w.Write([]byte(`{"error":"invalid or revoked API key"}`))
 				return
 			}
 
