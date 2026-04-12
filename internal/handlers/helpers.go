@@ -4,11 +4,13 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"time"
 
 	"cloud.google.com/go/firestore"
 )
 
 var store Store
+var startTime = time.Now()
 
 // Init initializes the handlers with a Firestore client.
 func Init(client *firestore.Client) {

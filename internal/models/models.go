@@ -51,6 +51,19 @@ type WebhookPayload struct {
 	Details *ThresholdDetails `json:"details,omitempty"` // only for THRESHOLD events
 }
 
+// STATUS
+type StatusResponse struct {
+	CountriesAPI   int    `json:"countries_api"`
+	MeteoAPI       int    `json:"meteo_api"`
+	OpenAQAPI      int    `json:"openaq_api"`
+	NominatimAPI   int    `json:"nominatim_api"`
+	CurrencyAPI    int    `json:"currency_api"`
+	NotificationDB int    `json:"notification_db"`
+	Webhooks       int    `json:"webhooks"`
+	Version        string `json:"version"`
+	Uptime         int    `json:"uptime"`
+}
+
 // DASHBOARD
 type AirQualityData struct {
 	PM25  float64 `json:"pm25"`

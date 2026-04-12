@@ -30,6 +30,9 @@ func main() {
 	mux.HandleFunc("PUT /envdash/v1/registrations/{id}", handlers.UpdateRegistrationHandler)
 	mux.HandleFunc("DELETE /envdash/v1/registrations/{id}", handlers.DeleteRegistrationHandler)
 
+	// status route
+	mux.HandleFunc("GET /envdash/v1/status/", handlers.StatusHandler)
+
 	// dashboard routes
 	mux.HandleFunc("GET /envdash/v1/dashboards/{id}", handlers.GetDashboardHandler)
 

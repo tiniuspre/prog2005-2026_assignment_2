@@ -8,6 +8,7 @@ import (
 	"time"
 )
 
+// Local memory implementation to be used in tests.
 type MemoryStore struct {
 	notifications map[string]models.NotificationRegistration
 	registrations map[string]models.Registration
