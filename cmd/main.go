@@ -24,6 +24,7 @@ func main() {
 	mux := http.NewServeMux()
 
 	// registration routes
+	mux.HandleFunc("/auth/", handlers.CreateAPIKeyHandler)
 	mux.HandleFunc("POST /envdash/v1/registrations/", handlers.CreateRegistrationHandler)
 	mux.HandleFunc("GET /envdash/v1/registrations/{id}", handlers.GetRegistrationHandler)
 	mux.HandleFunc("GET /envdash/v1/registrations/", handlers.ListRegistrationsHandler)
