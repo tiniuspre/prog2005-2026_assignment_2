@@ -13,6 +13,7 @@ func TestGetAirQuality(t *testing.T) {
 		mockBody   interface{}
 		mockStatus int
 		wantPM25   float64
+		wantPM10   float64
 		wantLevel  string
 		wantErr    bool
 	}{
@@ -36,10 +37,19 @@ func TestGetAirQuality(t *testing.T) {
 							},
 						},
 					},
+					{
+						"sensors": []map[string]interface{}{
+							{
+								"parameter": map[string]interface{}{"id": 1},
+								"latest":    map[string]interface{}{"value": 15.0},
+							},
+						},
+					},
 				},
 			},
 			mockStatus: http.StatusOK,
 			wantPM25:   10.0, // mean of 8.0 and 12.0
+			wantPM10:   15.0,
 			wantLevel:  "Good",
 			wantErr:    false,
 		},
@@ -50,6 +60,7 @@ func TestGetAirQuality(t *testing.T) {
 			},
 			mockStatus: http.StatusOK,
 			wantPM25:   -1,
+			wantPM10:   -1,
 			wantLevel:  "unknown",
 			wantErr:    false,
 		},
@@ -108,6 +119,9 @@ func TestGetAirQuality(t *testing.T) {
 				}
 				if result.Level != tt.wantLevel {
 					t.Errorf("Level: got %s, want %s", result.Level, tt.wantLevel)
+				}
+				if result.PM10 != tt.wantPM10 {
+					t.Errorf("PM10: got %f, want %f", result.PM10, tt.wantPM10)
 				}
 			}
 		})
