@@ -1,7 +1,11 @@
 # Readme
 
 ## Running Locally
-
+1. Enter cmd directory:
+```shell
+cd cmd
+```
+Then run
 ```bash
 go run .
 # Service starts on http://localhost:8080
@@ -20,7 +24,7 @@ https://console.firebase.google.com/u/1/project/.../settings/serviceaccounts/adm
 
 3. Then set environment variable:
 ```
-export GOOGLE_APPLICATION_CREDENTIALS="secrets/fire-key.json"
+export GOOGLE_APPLICATION_CREDENTIALS="../secrets/fire-key.json"
 ```
 
 4. Done
