@@ -7,35 +7,43 @@ import (
 	"cloud.google.com/go/firestore"
 )
 
-// APIKeyAuth returns a middleware that validates the X-API-Key header
-// against keys stored in Firestore. It skips the paths listed in publicPaths.
-func APIKeyAuth(client *firestore.Client, publicPaths []string) func(http.Handler) http.Handler {
-	public := make(map[string]bool, len(publicPaths))
-	for _, p := range publicPaths {
-		public[p] = true
-	}
+// PublicRoute defines a method + path pair that skips key validation.
+type PublicRoute struct {
+	Method string
+	Path   string
+}
 
+// APIKeyAuth returns middleware that validates the X-API-Key header
+// against keys stored in Firestore. Public paths are skipped.
+func APIKeyAuth(client *firestore.Client, public []PublicRoute) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			// Allow public endpoints through without a key.
-			if public[r.URL.Path] {
-				next.ServeHTTP(w, r)
-				return
+			for _, pr := range public {
+				if r.Method == pr.Method && r.URL.Path == pr.Path {
+					next.ServeHTTP(w, r)
+					return
+				}
 			}
 
 			key := r.Header.Get("X-API-Key")
 			if key == "" {
-				http.Error(w, "missing API key", http.StatusUnauthorized)
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusUnauthorized)
+				w.Write([]byte(`{"error":"missing API key"}`))
 				return
 			}
 
 			ak, err := firebase.GetAPIKey(r.Context(), client, key)
 			if err != nil {
-				http.Error(w, "failed to validate API key", http.StatusInternalServerError)
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusInternalServerError)
+				w.Write([]byte(`{"error":"failed to validate API key"}`))
 				return
 			}
 			if ak == nil {
-				http.Error(w, "invalid or revoked API key", http.StatusForbidden)
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusForbidden)
+				w.Write([]byte(`{"error":"invalid or revoked API key"}`))
 				return
 			}
 
