@@ -36,18 +36,18 @@ func TestStatusHandler_OK(t *testing.T) {
 
 	probeFn = func(url, userAgent string) int {
 		switch url {
-		case "http://129.241.150.113:8080/v3.1/":
+		case "http://129.241.150.113:8080/v3.1/name/norge":
 			return http.StatusOK
 		case "https://api.open-meteo.com/v1/forecast":
 			return http.StatusOK
-		case "https://api.openaq.org/v3/":
+		case "https://api.openaq.org/v3/locations":
 			return http.StatusOK
 		case "https://nominatim.openstreetmap.org/":
 			if userAgent != "prog2005-assignment2/1.0" {
 				t.Errorf("expected nominatim user agent, got %q", userAgent)
 			}
 			return http.StatusOK
-		case "http://129.241.150.113:9090/currency/":
+		case "http://129.241.150.113:9090/currency/nok":
 			return http.StatusOK
 		default:
 			t.Errorf("unexpected probe url %q", url)
