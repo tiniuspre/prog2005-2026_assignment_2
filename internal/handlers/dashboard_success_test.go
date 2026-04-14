@@ -13,11 +13,13 @@ import (
 func TestGetDashboardHandler_Success(t *testing.T) {
 	origCountryByISO := countryByISO
 	origWeatherFor := weatherFor
+	origCapitalCoordsFor := capitalCoordsFor
 	origAirQualityFor := airQualityFor
 	origExchangeRatesFor := exchangeRatesFor
 	defer func() {
 		countryByISO = origCountryByISO
 		weatherFor = origWeatherFor
+		capitalCoordsFor = origCapitalCoordsFor
 		airQualityFor = origAirQualityFor
 		exchangeRatesFor = origExchangeRatesFor
 	}()
@@ -60,6 +62,10 @@ func TestGetDashboardHandler_Success(t *testing.T) {
 			Temperature:   4.0,
 			Precipitation: 0.2,
 		}, nil
+	}
+
+	capitalCoordsFor = func(capital, country string) (*models.Coordinates, error) {
+		return &models.Coordinates{Latitude: 59.9139, Longitude: 10.7522}, nil
 	}
 
 	airQualityFor = func(latitude, longitude float64) (*models.AirQualityData, error) {

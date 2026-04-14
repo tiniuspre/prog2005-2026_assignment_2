@@ -45,9 +45,14 @@ func GetDashboardHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if reg.Features.AirQuality {
-		aq, err := airQualityFor(country.Coordinates.Latitude, country.Coordinates.Longitude)
+		capitalCoords, err := capitalCoordsFor(country.Capital, country.Name)
+		if err != nil {
+			writeError(w, http.StatusInternalServerError, "failed to fetch capital coordinates: "+err.Error())
+			return
+		}
+		aq, err := airQualityFor(capitalCoords.Latitude, capitalCoords.Longitude)
 		if err == nil {
-			features.AirQuality = aq
+			features.AirQuality = aq // already *models.AirQualityData
 			thresholdValues["pm25"] = aq.PM25
 			thresholdValues["pm10"] = aq.PM10
 		}
