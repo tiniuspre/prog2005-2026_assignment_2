@@ -1,0 +1,318 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Cloud Collection",
+    "version": "1.0.0",
+    "description": ""
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080"
+    }
+  ],
+  "paths": {
+    "/envdash/v1/registrations/": {
+      "post": {
+        "summary": "http://localhost:8080/envdash/v1/registrations/",
+        "parameters": [
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "sk-envdash-957eb0ac87e93a21"
+          }
+        ],
+        "responses": {},
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "country": {
+                    "type": "string"
+                  },
+                  "isoCode": {
+                    "type": "string"
+                  },
+                  "features": {
+                    "type": "object",
+                    "properties": {
+                      "temperature": {
+                        "type": "boolean"
+                      },
+                      "precipitation": {
+                        "type": "boolean"
+                      },
+                      "airQuality": {
+                        "type": "boolean"
+                      },
+                      "capital": {
+                        "type": "boolean"
+                      },
+                      "coordinates": {
+                        "type": "boolean"
+                      },
+                      "population": {
+                        "type": "boolean"
+                      },
+                      "area": {
+                        "type": "boolean"
+                      },
+                      "targetCurrencies": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "lastChange": {
+                    "type": "string",
+                    "format": "style"
+                  }
+                }
+              },
+              "example": {
+                "id": "7f3a91bc04e2d158",
+                "country": "Norway",
+                "isoCode": "NO",
+                "features": {
+                  "temperature": true,
+                  "precipitation": true,
+                  "airQuality": true,
+                  "capital": true,
+                  "coordinates": true,
+                  "population": true,
+                  "area": false,
+                  "targetCurrencies": [
+                    "EUR",
+                    "USD",
+                    "SEK"
+                  ]
+                },
+                "lastChange": "20250301 09:15"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/envdash/v1/registrations/Q4zWgvRn85qiT3fDkBDv": {
+      "get": {
+        "summary": "http://localhost:8080/envdash/v1/registrations/p6HBbC9owRy1tHAWlViO",
+        "parameters": [
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "sk-envdash-7b52caa147fa80f5"
+          }
+        ],
+        "responses": {},
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "country": {
+                    "type": "string"
+                  },
+                  "isoCode": {
+                    "type": "string"
+                  },
+                  "features": {
+                    "type": "object",
+                    "properties": {
+                      "temperature": {
+                        "type": "boolean"
+                      },
+                      "precipitation": {
+                        "type": "boolean"
+                      },
+                      "airQuality": {
+                        "type": "boolean"
+                      },
+                      "capital": {
+                        "type": "boolean"
+                      },
+                      "coordinates": {
+                        "type": "boolean"
+                      },
+                      "population": {
+                        "type": "boolean"
+                      },
+                      "area": {
+                        "type": "boolean"
+                      },
+                      "targetCurrencies": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "country": "Norway",
+                "isoCode": "NO",
+                "features": {
+                  "temperature": true,
+                  "precipitation": true,
+                  "airQuality": true,
+                  "capital": true,
+                  "coordinates": true,
+                  "population": true,
+                  "area": true,
+                  "targetCurrencies": [
+                    "EUR",
+                    "USD",
+                    "SEK"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "http://localhost:8080/envdash/v1/registrations/Q4zWgvRn85qiT3fDkBDv",
+        "parameters": [
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "sk-envdash-957eb0ac87e93a21"
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/envdash/v1/notifications/": {
+      "post": {
+        "summary": "http://localhost:8080/envdash/v1/notifications/",
+        "parameters": [
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "sk-envdash-957eb0ac87e93a21"
+          }
+        ],
+        "responses": {},
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "country": {
+                    "type": "string"
+                  },
+                  "event": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "url": "https://webhook.site/your-unique-id",
+                "country": "NO",
+                "event": "DELETE"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/envdash/v1/dashboards/Q4zWgvRn85qiT3fDkBDv": {
+      "get": {
+        "summary": "http://localhost:8080/envdash/v1/dashboards/Q4zWgvRn85qiT3fDkBDv",
+        "parameters": [
+          {
+            "name": "X-API-Key",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "sk-envdash-957eb0ac87e93a21"
+          }
+        ],
+        "responses": {},
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "country": {
+                    "type": "string"
+                  },
+                  "isoCode": {
+                    "type": "string"
+                  },
+                  "features": {
+                    "type": "object",
+                    "properties": {
+                      "temperature": {
+                        "type": "boolean"
+                      },
+                      "precipitation": {
+                        "type": "boolean"
+                      },
+                      "airQuality": {
+                        "type": "boolean"
+                      },
+                      "capital": {
+                        "type": "boolean"
+                      },
+                      "coordinates": {
+                        "type": "boolean"
+                      },
+                      "population": {
+                        "type": "boolean"
+                      },
+                      "area": {
+                        "type": "boolean"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "country": "Norway",
+                "isoCode": "NO",
+                "features": {
+                  "temperature": true,
+                  "precipitation": true,
+                  "airQuality": true,
+                  "capital": true,
+                  "coordinates": true,
+                  "population": true,
+                  "area": true
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
