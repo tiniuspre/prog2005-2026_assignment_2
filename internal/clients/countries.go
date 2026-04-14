@@ -11,9 +11,6 @@ import (
 	"strings"
 )
 
-// TODO create folder/file for consts - var for testing purposes
-var restCountriesAPI = "http://129.241.150.113:8080/v3.1/"
-
 // GetCountry fetches data from the Countries API by ISO code
 func GetCountry(countryCode string) (*models.Country, error) {
 	countryCode = strings.ToUpper(countryCode)

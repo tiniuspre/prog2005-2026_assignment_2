@@ -9,8 +9,6 @@ import (
 	"os"
 )
 
-var openaqBaseURL = "https://api.openaq.org/v3"
-
 type openaqResponse struct {
 	Results []struct {
 		Sensors []struct {
