@@ -49,14 +49,13 @@ func StatusHandler(w http.ResponseWriter, _ *http.Request) {
 		wg.Add(1)
 		go func(key, url, ua string) {
 			defer wg.Done()
-			code := healthCheck(url, ua)
+			code := probeFn(url, ua)
 			mu.Lock()
 			results[key] = code
 			mu.Unlock()
 		}(c.key, c.url, c.userAgent)
 	}
 
-	// Count webhooks and test Firestore connectivity in parallel with API checks
 	wg.Add(1)
 	var dbStatus, webhookCount int
 	go func() {

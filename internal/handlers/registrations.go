@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"assignment_2/internal/clients"
 	"assignment_2/internal/models"
 	"context"
 	"encoding/json"
@@ -22,7 +21,7 @@ func CreateRegistrationHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if reg.IsoCode != "" {
-		country, err := clients.GetCountry(reg.IsoCode)
+		country, err := countryByISO(reg.IsoCode)
 		if err != nil {
 			writeError(w, http.StatusBadRequest, "invalid country iso code")
 			return
@@ -30,7 +29,7 @@ func CreateRegistrationHandler(w http.ResponseWriter, r *http.Request) {
 		reg.Country = country.Name
 		reg.IsoCode = country.Code
 	} else {
-		country, err := clients.GetCountryByName(reg.Country)
+		country, err := countryByName(reg.Country)
 		if err != nil {
 			writeError(w, http.StatusBadRequest, "invalid country name")
 			return
@@ -120,14 +119,15 @@ func UpdateRegistrationHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if update.Country != "" {
-		country, err := clients.GetCountryByName(update.Country)
+		country, err := countryByName(update.Country)
 		if err != nil {
 			writeError(w, http.StatusBadRequest, "invalid country name")
 			return
 		}
+		reg.Country = country.Name
 		reg.IsoCode = country.Code
 	} else if update.IsoCode != "" {
-		country, err := clients.GetCountry(update.IsoCode)
+		country, err := countryByISO(update.IsoCode)
 		if err != nil {
 			writeError(w, http.StatusBadRequest, "invalid country iso code")
 			return

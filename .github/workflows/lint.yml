@@ -30,6 +30,9 @@ jobs:
             exit 1
           fi
 
+      - name: Run tests
+        run: go test ./... -cover
+
       - uses: golangci/golangci-lint-action@v9
         with:
           version: v2.10

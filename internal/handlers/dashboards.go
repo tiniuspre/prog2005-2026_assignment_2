@@ -1,11 +1,8 @@
 package handlers
 
 import (
-	"assignment_2/internal/clients"
-	"assignment_2/internal/firebase"
 	"assignment_2/internal/models"
 	"context"
-	"log"
 	"net/http"
 	"time"
 )
@@ -22,30 +19,17 @@ func GetDashboardHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Check if country is cached
-	country, err := firebase.GetCachedCountry(r.Context(), firestoreClient, reg.IsoCode)
+	country, err := countryByISO(reg.IsoCode)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "failed to read cache")
+		writeError(w, http.StatusInternalServerError, "failed to fetch country data")
 		return
-	}
-	if country == nil {
-		country, err = clients.GetCountry(reg.IsoCode)
-		if err != nil {
-			writeError(w, http.StatusInternalServerError, "failed to fetch country data")
-			return
-		}
-		// Cache new country
-		if err := firebase.SetCachedCountry(r.Context(), firestoreClient, reg.IsoCode, country); err != nil {
-			log.Printf("warning: failed to cache country data: %v", err)
-		}
 	}
 
 	features := models.DashboardFeatures{}
 	thresholdValues := map[string]float64{}
 
 	if reg.Features.Temperature || reg.Features.Precipitation {
-		weather, err := clients.GetWeather(country.Coordinates.Latitude,
-			country.Coordinates.Longitude)
+		weather, err := weatherFor(country.Coordinates.Latitude, country.Coordinates.Longitude)
 		if err != nil {
 			writeError(w, http.StatusInternalServerError, "weather fetch failed: "+err.Error())
 			return
@@ -61,14 +45,9 @@ func GetDashboardHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if reg.Features.AirQuality {
-		capitalCoords, err := clients.GetCapitalCoordinates(country.Capital, country.Name)
-		if err != nil {
-			writeError(w, http.StatusInternalServerError, "failed to fetch capital coordinates: "+err.Error())
-			return
-		}
-		aq, err := clients.GetAirQuality(capitalCoords.Latitude, capitalCoords.Longitude)
+		aq, err := airQualityFor(country.Coordinates.Latitude, country.Coordinates.Longitude)
 		if err == nil {
-			features.AirQuality = aq // already *models.AirQualityData
+			features.AirQuality = aq
 			thresholdValues["pm25"] = aq.PM25
 			thresholdValues["pm10"] = aq.PM10
 		}
@@ -88,8 +67,7 @@ func GetDashboardHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if len(reg.Features.TargetCurrencies) > 0 && len(country.Currencies) > 0 {
-		rates, err := clients.GetExchangeRates(country.Currencies[0],
-			reg.Features.TargetCurrencies)
+		rates, err := exchangeRatesFor(country.Currencies[0], reg.Features.TargetCurrencies)
 		if err == nil {
 			features.TargetCurrencies = rates
 		}
