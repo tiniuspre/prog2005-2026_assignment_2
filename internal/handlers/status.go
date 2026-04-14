@@ -4,13 +4,20 @@ import (
 	"assignment_2/internal/models"
 	"context"
 	"net/http"
+	"os"
+	"strings"
 	"sync"
 	"time"
 )
 
 const version = "v1"
 
-// healthCheck performs a HEAD request and returns the HTTP status code.
+// Assuming these exist elsewhere in your package:
+// var probeFn = healthCheck
+// var startTime = time.Now()
+// var store NotificationStore
+
+// healthCheck performs a request and returns the HTTP status code.
 // If the service is unreachable, it returns 503.
 func healthCheck(url, userAgent string) int {
 	client := &http.Client{Timeout: 5 * time.Second}
@@ -19,8 +26,18 @@ func healthCheck(url, userAgent string) int {
 	if err != nil {
 		return http.StatusServiceUnavailable
 	}
+
 	if userAgent != "" {
 		req.Header.Set("User-Agent", userAgent)
+	}
+
+	// OpenAQ and the course-hosted services do not reliably support HEAD.
+	if strings.Contains(url, "api.openaq.org") {
+		req.Header.Set("X-API-Key", os.Getenv("OPENAQ_API_KEY"))
+		req.Method = http.MethodGet
+	}
+	if strings.Contains(url, "129.241.150.113") {
+		req.Method = http.MethodGet
 	}
 
 	resp, err := client.Do(req)
@@ -61,8 +78,8 @@ func StatusHandler(w http.ResponseWriter, _ *http.Request) {
 		}(c.key, c.url, c.userAgent)
 	}
 
-	wg.Add(1)
 	var dbStatus, webhookCount int
+	wg.Add(1)
 	go func() {
 		defer wg.Done()
 
