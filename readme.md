@@ -1,15 +1,47 @@
 # Readme
 
-## Running Locally
-1. Enter cmd directory:
-```shell
-cd cmd
+## How to setup and run
+
+### Prerequisites
+- Docker
+
+
+### First time setup with Docker
+
+1. Copy .env.example to .env and fill in the values:
 ```
-Then run
+cp .env.example .env
+```
+
+2. Download the firebase key and save it as `secrets/fire-key.json`:
+3. Download openaq api key and set it in the .env file.
+4. Then build and run the docker container:
 ```bash
-go run .
-# Service starts on http://localhost:8080
+docker compose up --build
 ```
+or if you want to run it in the background:
+```bash
+docker compose up --build -d
+```
+
+### First time setup without Docker
+1. Copy .env.example to .env and fill in the values:
+```shell
+cp .env.example .env
+```
+2. Download the firebase key and save it as `secrets/fire-key.json`:
+3. Download openaq api key and set it in the .env file.
+4. Then set environment variable:
+```shell
+export GOOGLE_APPLICATION_CREDENTIALS="secrets/fire-key.json"
+export OPENAQ_KEY="your openaq key"
+```
+5. Run the project:
+```bash
+go run cmd/main.go
+```
+
+---
 
 ## Firebase setup
 
@@ -23,11 +55,12 @@ https://console.firebase.google.com/u/1/project/.../settings/serviceaccounts/adm
 
 3. Then set environment variable:
 ```
-export GOOGLE_APPLICATION_CREDENTIALS="../secrets/fire-key.json"
+export GOOGLE_APPLICATION_CREDENTIALS="secrets/fire-key.json"
 ```
 
 4. Done
 
+---
 ## Docker
 Building and running:
 ```bash
@@ -39,7 +72,7 @@ If in need of detached / running in the background:
 docker compose up --build -d
 ```
 
-
+---
 # How to use
 
 1. Register a user:
