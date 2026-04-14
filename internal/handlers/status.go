@@ -12,7 +12,12 @@ import (
 
 const version = "v1"
 
-// healthCheck performs a GET request and returns the HTTP status code.
+// Assuming these exist elsewhere in your package:
+// var probeFn = healthCheck
+// var startTime = time.Now()
+// var store NotificationStore
+
+// healthCheck performs a request and returns the HTTP status code.
 // If the service is unreachable, it returns 503.
 func healthCheck(url, userAgent string) int {
 	client := &http.Client{Timeout: 5 * time.Second}
@@ -21,9 +26,12 @@ func healthCheck(url, userAgent string) int {
 	if err != nil {
 		return http.StatusServiceUnavailable
 	}
+
 	if userAgent != "" {
 		req.Header.Set("User-Agent", userAgent)
 	}
+
+	// OpenAQ and the course-hosted services do not reliably support HEAD.
 	if strings.Contains(url, "api.openaq.org") {
 		req.Header.Set("X-API-Key", os.Getenv("OPENAQ_API_KEY"))
 		req.Method = http.MethodGet
@@ -47,11 +55,11 @@ func StatusHandler(w http.ResponseWriter, _ *http.Request) {
 		url       string
 		userAgent string
 	}{
-		{"countries_api", "http://129.241.150.113:8080/v3.1/name/norge", ""},
+		{"countries_api", "http://129.241.150.113:8080/v3.1/", ""},
 		{"meteo_api", "https://api.open-meteo.com/v1/forecast", ""},
-		{"openaq_api", "https://api.openaq.org/v3/locations", ""},
+		{"openaq_api", "https://api.openaq.org/v3/", ""},
 		{"nominatim_api", "https://nominatim.openstreetmap.org/", "prog2005-assignment2/1.0"},
-		{"currency_api", "http://129.241.150.113:9090/currency/nok", ""},
+		{"currency_api", "http://129.241.150.113:9090/currency/", ""},
 	}
 
 	results := make(map[string]int, len(checks))
@@ -70,8 +78,8 @@ func StatusHandler(w http.ResponseWriter, _ *http.Request) {
 		}(c.key, c.url, c.userAgent)
 	}
 
-	wg.Add(1)
 	var dbStatus, webhookCount int
+	wg.Add(1)
 	go func() {
 		defer wg.Done()
 

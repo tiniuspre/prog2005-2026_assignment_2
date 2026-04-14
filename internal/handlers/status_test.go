@@ -70,28 +70,28 @@ func TestStatusHandler_OK(t *testing.T) {
 	}
 
 	if resp.CountriesAPI != http.StatusOK {
-		t.Errorf("countries_api: got %d", resp.CountriesAPI)
+		t.Errorf("countries_api: got %d, want %d", resp.CountriesAPI, http.StatusOK)
 	}
 	if resp.MeteoAPI != http.StatusOK {
-		t.Errorf("meteo_api: got %d", resp.MeteoAPI)
+		t.Errorf("meteo_api: got %d, want %d", resp.MeteoAPI, http.StatusOK)
 	}
 	if resp.OpenAQAPI != http.StatusOK {
-		t.Errorf("openaq_api: got %d", resp.OpenAQAPI)
+		t.Errorf("openaq_api: got %d, want %d", resp.OpenAQAPI, http.StatusOK)
 	}
 	if resp.NominatimAPI != http.StatusOK {
-		t.Errorf("nominatim_api: got %d", resp.NominatimAPI)
+		t.Errorf("nominatim_api: got %d, want %d", resp.NominatimAPI, http.StatusOK)
 	}
 	if resp.CurrencyAPI != http.StatusOK {
-		t.Errorf("currency_api: got %d", resp.CurrencyAPI)
+		t.Errorf("currency_api: got %d, want %d", resp.CurrencyAPI, http.StatusOK)
 	}
 	if resp.NotificationDB != http.StatusOK {
 		t.Errorf("notification_db: got %d, want %d", resp.NotificationDB, http.StatusOK)
 	}
 	if resp.Webhooks != 2 {
-		t.Errorf("webhooks: got %d, want 2", resp.Webhooks)
+		t.Errorf("webhooks: got %d, want %d", resp.Webhooks, 2)
 	}
 	if resp.Version != "v1" {
-		t.Errorf("version: got %q, want v1", resp.Version)
+		t.Errorf("version: got %q, want %q", resp.Version, "v1")
 	}
 	if resp.Uptime < 10 {
 		t.Errorf("uptime: got %d, want >= 10", resp.Uptime)
@@ -169,6 +169,6 @@ func TestStatusHandler_DBFailure(t *testing.T) {
 		t.Errorf("notification_db: got %d, want %d", resp.NotificationDB, http.StatusServiceUnavailable)
 	}
 	if resp.Webhooks != 0 {
-		t.Errorf("webhooks: got %d, want 0", resp.Webhooks)
+		t.Errorf("webhooks: got %d, want %d", resp.Webhooks, 0)
 	}
 }
