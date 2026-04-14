@@ -10,8 +10,6 @@ import (
 	"strconv"
 )
 
-var nominatimBaseURL = "https://nominatim.openstreetmap.org"
-
 type nominatimResult struct {
 	Lat string `json:"lat"`
 	Lon string `json:"lon"`

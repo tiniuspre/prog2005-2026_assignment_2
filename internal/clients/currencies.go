@@ -8,9 +8,6 @@ import (
 	"strings"
 )
 
-// TODO create folder/file for consts - var for testing purposes
-var currencyAPI = "http://129.241.150.113:9090/currency/"
-
 // GetExchangeRates fetches exchange rates from a base currency to a list of target currencies
 func GetExchangeRates(baseCurrency string, targetCurrencies []string) (map[string]float64, error) {
 	url := currencyAPI + strings.ToLower(baseCurrency)
