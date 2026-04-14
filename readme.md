@@ -25,18 +25,15 @@ docker compose up --build -d
 ```
 
 ### First time setup without Docker
-1. Copy .env.example to .env and fill in the values:
-```shell
-cp .env.example .env
-```
-2. Download the firebase key and save it as `secrets/fire-key.json`:
-3. Download openaq api key and set it in the .env file.
-4. Then set environment variable:
+1. Download the firebase key and save it as `secrets/fire-key.json`:
+2. Download openaq api key and set it in the .env file.
+3. Then set environment variable:
 ```shell
 export GOOGLE_APPLICATION_CREDENTIALS="secrets/fire-key.json"
 export OPENAQ_KEY="your openaq key"
+export PORT=8080
 ```
-5. Run the project:
+4. Run the project:
 ```bash
 go run cmd/main.go
 ```
