@@ -5,6 +5,9 @@
 - Sindre Olsen
 - Jonas Tomren
 
+##### Main repo URL
+[https://github.com/tiniuspre/prog2005-2026_assignment_2](https://github.com/tiniuspre/prog2005-2026_assignment_2)
+
 ## How to setup and run
 
 ### Prerequisites
