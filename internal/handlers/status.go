@@ -4,13 +4,15 @@ import (
 	"assignment_2/internal/models"
 	"context"
 	"net/http"
+	"os"
+	"strings"
 	"sync"
 	"time"
 )
 
 const version = "v1"
 
-// healthCheck performs a HEAD request and returns the HTTP status code.
+// healthCheck performs a GET request and returns the HTTP status code.
 // If the service is unreachable, it returns 503.
 func healthCheck(url, userAgent string) int {
 	client := &http.Client{Timeout: 5 * time.Second}
@@ -21,6 +23,9 @@ func healthCheck(url, userAgent string) int {
 	}
 	if userAgent != "" {
 		req.Header.Set("User-Agent", userAgent)
+	}
+	if strings.Contains(url, "api.openaq.org") {
+		req.Header.Set("X-API-Key", os.Getenv("OPENAQ_API_KEY"))
 	}
 
 	resp, err := client.Do(req)
@@ -38,11 +43,11 @@ func StatusHandler(w http.ResponseWriter, _ *http.Request) {
 		url       string
 		userAgent string
 	}{
-		{"countries_api", "http://129.241.150.113:8080/v3.1/", ""},
+		{"countries_api", "http://129.241.150.113:8080/v3.1/name/norge", ""},
 		{"meteo_api", "https://api.open-meteo.com/v1/forecast", ""},
 		{"openaq_api", "https://api.openaq.org/v3/", ""},
 		{"nominatim_api", "https://nominatim.openstreetmap.org/", "prog2005-assignment2/1.0"},
-		{"currency_api", "http://129.241.150.113:9090/currency/", ""},
+		{"currency_api", "http://129.241.150.113:9090/currency/nok", ""},
 	}
 
 	results := make(map[string]int, len(checks))
