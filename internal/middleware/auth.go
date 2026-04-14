@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"assignment_2/internal/firebase"
 	"net/http"
 
 	"cloud.google.com/go/firestore"
@@ -33,7 +32,7 @@ func APIKeyAuth(client *firestore.Client, public []PublicRoute) func(http.Handle
 				return
 			}
 
-			ak, err := firebase.GetAPIKey(r.Context(), client, key)
+			ak, err := getAPIKeyFn(r.Context(), client, key)
 			if err != nil {
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusInternalServerError)

@@ -41,7 +41,7 @@ func CreateAPIKeyHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	key, err := generateKey()
+	key, err := generateKeyFn()
 	if err != nil {
 		http.Error(w, "failed to generate key", http.StatusInternalServerError)
 		return
@@ -51,10 +51,10 @@ func CreateAPIKeyHandler(w http.ResponseWriter, r *http.Request) {
 		Key:       key,
 		Name:      req.Name,
 		Email:     req.Email,
-		CreatedAt: firebase.FormatTimestamp(),
+		CreatedAt: formatTimestampFn(),
 	}
 
-	if err := firebase.CreateAPIKey(r.Context(), firestoreClient, ak); err != nil {
+	if err := createAPIKeyFn(r.Context(), firestoreClient, ak); err != nil {
 		http.Error(w, "failed to store API key", http.StatusInternalServerError)
 		return
 	}
@@ -73,7 +73,7 @@ func DeleteAPIKeyHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	found, err := firebase.DeleteAPIKey(r.Context(), firestoreClient, key)
+	found, err := deleteAPIKeyFn(r.Context(), firestoreClient, key)
 	if err != nil {
 		http.Error(w, "failed to delete API key", http.StatusInternalServerError)
 		return
