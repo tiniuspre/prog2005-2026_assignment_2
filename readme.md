@@ -1,5 +1,10 @@
 # Readme
 
+##### Made by
+- Tinius J. Presterud
+- Sindre Olsen
+- Jonas Tomren
+
 ## How to setup and run
 
 ### Prerequisites
@@ -88,3 +93,91 @@ Use the key like:
 ```bash
 curl -s -X GET http://localhost:8080/somepath \
     -H "X-API-Key: sk-envdash-ba2c...0d8"
+```
+
+# About the project
+
+### Project Structure
+
+```
+.
+├── Dockerfile
+├── cmd
+│   └── main.go
+├── docker-compose.yml
+├── files.txt
+├── go.mod
+├── go.sum
+├── internal
+│   ├── clients
+│   │   ├── countries.go
+│   │   ├── countries_test.go
+│   │   ├── currencies.go
+│   │   ├── currencies_test.go
+│   │   ├── meteo.go
+│   │   ├── meteo_test.go
+│   │   ├── nominatim.go
+│   │   ├── nominatim_test.go
+│   │   ├── openaq.go
+│   │   └── openaq_test.go
+│   ├── firebase
+│   │   ├── api-keys.go
+│   │   ├── cache.go
+│   │   ├── client.go
+│   │   ├── notifications.go
+│   │   └── registrations.go
+│   ├── handlers
+│   │   ├── auth.go
+│   │   ├── auth_test.go
+│   │   ├── dashboard_success_test.go
+│   │   ├── dashboards.go
+│   │   ├── dashboards_test.go
+│   │   ├── deps.go
+│   │   ├── dispatch.go
+│   │   ├── dispatch_test.go
+│   │   ├── helpers.go
+│   │   ├── notifications.go
+│   │   ├── notifications_test.go
+│   │   ├── registrations.go
+│   │   ├── registrations_success_test.go
+│   │   ├── registrations_test.go
+│   │   ├── status.go
+│   │   ├── status_test.go
+│   │   ├── store.go
+│   │   ├── store_firestore.go
+│   │   └── store_memory.go
+│   ├── middleware
+│   │   ├── auth.go
+│   │   ├── auth_test.go
+│   │   └── deps.go
+│   └── models
+│       ├── country.go
+│       └── models.go
+├── readme.md
+└── secrets
+    └── fire-key.json
+```
+
+### API Endpoints
+
+```
+### API Endpoints
+
+POST   /auth/                             # Register a new user and get an API key
+DELETE /auth/{key}                        # Revoke an API key
+
+POST   /envdash/v1/registrations/         # Create a new dashboard configuration
+GET    /envdash/v1/registrations/{id}     # Get one registration by ID
+GET    /envdash/v1/registrations/         # List all registrations
+PUT    /envdash/v1/registrations/{id}     # Update an existing registration
+DELETE /envdash/v1/registrations/{id}     # Delete a registration
+
+GET    /envdash/v1/dashboards/{id}        # Get a populated dashboard for a registration
+
+POST   /envdash/v1/notifications/         # Register a new webhook notification
+GET    /envdash/v1/notifications/{id}     # Get one notification by ID
+GET    /envdash/v1/notifications/         # List all notifications
+DELETE /envdash/v1/notifications/{id}     # Delete a notification
+
+GET    /envdash/v1/status/                # Get service and dependency health status
+```
