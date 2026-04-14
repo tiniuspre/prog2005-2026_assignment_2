@@ -1,15 +1,49 @@
 # Readme
 
-## Running Locally
-1. Enter cmd directory:
-```shell
-cd cmd
+##### Made by
+- Tinius J. Presterud
+- Sindre Olsen
+- Jonas Tomren
+
+## How to setup and run
+
+### Prerequisites
+- Docker
+
+
+### First time setup with Docker
+
+1. Copy .env.example to .env and fill in the values:
 ```
-Then run
+cp .env.example .env
+```
+
+2. Download the firebase key and save it as `secrets/fire-key.json`:
+3. Download openaq api key and set it in the .env file.
+4. Then build and run the docker container:
 ```bash
-go run .
-# Service starts on http://localhost:8080
+docker compose up --build
 ```
+or if you want to run it in the background:
+```bash
+docker compose up --build -d
+```
+
+### First time setup without Docker
+1. Download the firebase key and save it as `secrets/fire-key.json`:
+2. Download openaq api key and set it in the .env file.
+3. Then set environment variable:
+```shell
+export GOOGLE_APPLICATION_CREDENTIALS="secrets/fire-key.json"
+export OPENAQ_API_KEY="your openaq key"
+export PORT=8080
+```
+4. Run the project:
+```bash
+go run cmd/main.go
+```
+
+---
 
 ## Firebase setup
 
@@ -23,11 +57,12 @@ https://console.firebase.google.com/u/1/project/.../settings/serviceaccounts/adm
 
 3. Then set environment variable:
 ```
-export GOOGLE_APPLICATION_CREDENTIALS="../secrets/fire-key.json"
+export GOOGLE_APPLICATION_CREDENTIALS="secrets/fire-key.json"
 ```
 
 4. Done
 
+---
 ## Docker
 Building and running:
 ```bash
@@ -39,7 +74,7 @@ If in need of detached / running in the background:
 docker compose up --build -d
 ```
 
-
+---
 # How to use
 
 1. Register a user:
@@ -58,3 +93,91 @@ Use the key like:
 ```bash
 curl -s -X GET http://localhost:8080/somepath \
     -H "X-API-Key: sk-envdash-ba2c...0d8"
+```
+
+# About the project
+
+### Project Structure
+
+```
+.
+├── Dockerfile
+├── cmd
+│   └── main.go
+├── docker-compose.yml
+├── files.txt
+├── go.mod
+├── go.sum
+├── internal
+│   ├── clients
+│   │   ├── countries.go
+│   │   ├── countries_test.go
+│   │   ├── currencies.go
+│   │   ├── currencies_test.go
+│   │   ├── meteo.go
+│   │   ├── meteo_test.go
+│   │   ├── nominatim.go
+│   │   ├── nominatim_test.go
+│   │   ├── openaq.go
+│   │   └── openaq_test.go
+│   ├── firebase
+│   │   ├── api-keys.go
+│   │   ├── cache.go
+│   │   ├── client.go
+│   │   ├── notifications.go
+│   │   └── registrations.go
+│   ├── handlers
+│   │   ├── auth.go
+│   │   ├── auth_test.go
+│   │   ├── dashboard_success_test.go
+│   │   ├── dashboards.go
+│   │   ├── dashboards_test.go
+│   │   ├── deps.go
+│   │   ├── dispatch.go
+│   │   ├── dispatch_test.go
+│   │   ├── helpers.go
+│   │   ├── notifications.go
+│   │   ├── notifications_test.go
+│   │   ├── registrations.go
+│   │   ├── registrations_success_test.go
+│   │   ├── registrations_test.go
+│   │   ├── status.go
+│   │   ├── status_test.go
+│   │   ├── store.go
+│   │   ├── store_firestore.go
+│   │   └── store_memory.go
+│   ├── middleware
+│   │   ├── auth.go
+│   │   ├── auth_test.go
+│   │   └── deps.go
+│   └── models
+│       ├── country.go
+│       └── models.go
+├── readme.md
+└── secrets
+    └── fire-key.json
+```
+
+### API Endpoints
+
+```
+### API Endpoints
+
+POST   /auth/                             # Register a new user and get an API key
+DELETE /auth/{key}                        # Revoke an API key
+
+POST   /envdash/v1/registrations/         # Create a new dashboard configuration
+GET    /envdash/v1/registrations/{id}     # Get one registration by ID
+GET    /envdash/v1/registrations/         # List all registrations
+PUT    /envdash/v1/registrations/{id}     # Update an existing registration
+DELETE /envdash/v1/registrations/{id}     # Delete a registration
+
+GET    /envdash/v1/dashboards/{id}        # Get a populated dashboard for a registration
+
+POST   /envdash/v1/notifications/         # Register a new webhook notification
+GET    /envdash/v1/notifications/{id}     # Get one notification by ID
+GET    /envdash/v1/notifications/         # List all notifications
+DELETE /envdash/v1/notifications/{id}     # Delete a notification
+
+GET    /envdash/v1/status/                # Get service and dependency health status
+```
