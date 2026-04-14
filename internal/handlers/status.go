@@ -55,11 +55,11 @@ func StatusHandler(w http.ResponseWriter, _ *http.Request) {
 		url       string
 		userAgent string
 	}{
-		{"countries_api", "http://129.241.150.113:8080/v3.1/", ""},
+		{"countries_api", "http://129.241.150.113:8080/v3.1/name/norge", ""},
 		{"meteo_api", "https://api.open-meteo.com/v1/forecast", ""},
-		{"openaq_api", "https://api.openaq.org/v3/", ""},
+		{"openaq_api", "https://api.openaq.org/v3/locations", ""},
 		{"nominatim_api", "https://nominatim.openstreetmap.org/", "prog2005-assignment2/1.0"},
-		{"currency_api", "http://129.241.150.113:9090/currency/", ""},
+		{"currency_api", "http://129.241.150.113:9090/currency/nok", ""},
 	}
 
 	results := make(map[string]int, len(checks))
