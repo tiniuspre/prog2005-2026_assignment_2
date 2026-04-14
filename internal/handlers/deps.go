@@ -9,6 +9,7 @@ var (
 	countryByISO     = clients.GetCountry
 	countryByName    = clients.GetCountryByName
 	weatherFor       = clients.GetWeather
+	capitalCoordsFor = clients.GetCapitalCoordinates
 	airQualityFor    = clients.GetAirQuality
 	exchangeRatesFor = clients.GetExchangeRates
 
