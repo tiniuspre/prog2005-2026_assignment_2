@@ -2,8 +2,10 @@ package handlers
 
 import (
 	"assignment_2/internal/clients"
+	"assignment_2/internal/firebase"
 	"assignment_2/internal/models"
 	"context"
+	"log"
 	"net/http"
 	"time"
 )
@@ -20,10 +22,22 @@ func GetDashboardHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	country, err := clients.GetCountry(reg.IsoCode)
+	// Check if country is cached
+	country, err := firebase.GetCachedCountry(r.Context(), firestoreClient, reg.IsoCode)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "failed to fetch country data")
+		writeError(w, http.StatusInternalServerError, "failed to read cache")
 		return
+	}
+	if country == nil {
+		country, err = clients.GetCountry(reg.IsoCode)
+		if err != nil {
+			writeError(w, http.StatusInternalServerError, "failed to fetch country data")
+			return
+		}
+		// Cache new country
+		if err := firebase.SetCachedCountry(r.Context(), firestoreClient, reg.IsoCode, country); err != nil {
+			log.Printf("warning: failed to cache country data: %v", err)
+		}
 	}
 
 	features := models.DashboardFeatures{}
