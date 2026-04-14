@@ -30,7 +30,7 @@ docker compose up --build -d
 3. Then set environment variable:
 ```shell
 export GOOGLE_APPLICATION_CREDENTIALS="secrets/fire-key.json"
-export OPENAQ_KEY="your openaq key"
+export OPENAQ_API_KEY="your openaq key"
 export PORT=8080
 ```
 4. Run the project:

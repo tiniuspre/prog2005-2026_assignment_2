@@ -10,21 +10,25 @@ import (
 
 const version = "v1"
 
-// healthCheck performs a HEAD request and returns the HTTP status code, or 0 on network failure.
+// healthCheck performs a HEAD request and returns the HTTP status code.
+// If the service is unreachable, it returns 503.
 func healthCheck(url, userAgent string) int {
 	client := &http.Client{Timeout: 5 * time.Second}
+
 	req, err := http.NewRequest(http.MethodHead, url, nil)
 	if err != nil {
-		return 0
+		return http.StatusServiceUnavailable
 	}
 	if userAgent != "" {
 		req.Header.Set("User-Agent", userAgent)
 	}
+
 	resp, err := client.Do(req)
 	if err != nil {
-		return 0
+		return http.StatusServiceUnavailable
 	}
 	defer func() { _ = resp.Body.Close() }()
+
 	return resp.StatusCode
 }
 
@@ -50,6 +54,7 @@ func StatusHandler(w http.ResponseWriter, _ *http.Request) {
 		go func(key, url, ua string) {
 			defer wg.Done()
 			code := probeFn(url, ua)
+
 			mu.Lock()
 			results[key] = code
 			mu.Unlock()
@@ -60,19 +65,21 @@ func StatusHandler(w http.ResponseWriter, _ *http.Request) {
 	var dbStatus, webhookCount int
 	go func() {
 		defer wg.Done()
+
 		regs, err := store.ListNotifications(context.Background())
 		if err != nil {
 			dbStatus = http.StatusServiceUnavailable
 			webhookCount = 0
-		} else {
-			dbStatus = http.StatusOK
-			webhookCount = len(regs)
+			return
 		}
+
+		dbStatus = http.StatusOK
+		webhookCount = len(regs)
 	}()
 
 	wg.Wait()
 
-	writeJSON(w, http.StatusOK, models.StatusResponse{
+	resp := models.StatusResponse{
 		CountriesAPI:   results["countries_api"],
 		MeteoAPI:       results["meteo_api"],
 		OpenAQAPI:      results["openaq_api"],
@@ -82,5 +89,17 @@ func StatusHandler(w http.ResponseWriter, _ *http.Request) {
 		Webhooks:       webhookCount,
 		Version:        version,
 		Uptime:         int(time.Since(startTime).Seconds()),
-	})
+	}
+
+	overallStatus := http.StatusOK
+	if resp.CountriesAPI != http.StatusOK ||
+		resp.MeteoAPI != http.StatusOK ||
+		resp.OpenAQAPI != http.StatusOK ||
+		resp.NominatimAPI != http.StatusOK ||
+		resp.CurrencyAPI != http.StatusOK ||
+		resp.NotificationDB != http.StatusOK {
+		overallStatus = http.StatusInternalServerError
+	}
+
+	writeJSON(w, overallStatus, resp)
 }

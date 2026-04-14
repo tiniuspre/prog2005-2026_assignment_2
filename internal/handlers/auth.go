@@ -33,17 +33,17 @@ func generateKey() (string, error) {
 func CreateAPIKeyHandler(w http.ResponseWriter, r *http.Request) {
 	var req authRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "invalid JSON body", http.StatusBadRequest)
+		writeError(w, http.StatusBadRequest, "invalid JSON body")
 		return
 	}
 	if req.Name == "" || req.Email == "" {
-		http.Error(w, "name and email are required", http.StatusBadRequest)
+		writeError(w, http.StatusBadRequest, "name and email are required")
 		return
 	}
 
 	key, err := generateKeyFn()
 	if err != nil {
-		http.Error(w, "failed to generate key", http.StatusInternalServerError)
+		writeError(w, http.StatusInternalServerError, "failed to generate key")
 		return
 	}
 
@@ -55,7 +55,7 @@ func CreateAPIKeyHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := createAPIKeyFn(r.Context(), firestoreClient, ak); err != nil {
-		http.Error(w, "failed to store API key", http.StatusInternalServerError)
+		writeError(w, http.StatusInternalServerError, "failed to store API key")
 		return
 	}
 
@@ -69,17 +69,17 @@ func CreateAPIKeyHandler(w http.ResponseWriter, r *http.Request) {
 func DeleteAPIKeyHandler(w http.ResponseWriter, r *http.Request) {
 	key := r.PathValue("key")
 	if key == "" {
-		http.Error(w, "key is required", http.StatusBadRequest)
+		writeError(w, http.StatusBadRequest, "key is required")
 		return
 	}
 
 	found, err := deleteAPIKeyFn(r.Context(), firestoreClient, key)
 	if err != nil {
-		http.Error(w, "failed to delete API key", http.StatusInternalServerError)
+		writeError(w, http.StatusInternalServerError, "failed to delete API key")
 		return
 	}
 	if !found {
-		http.Error(w, "API key not found", http.StatusNotFound)
+		writeError(w, http.StatusNotFound, "API key not found")
 		return
 	}
 
