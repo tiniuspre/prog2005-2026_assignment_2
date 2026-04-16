@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	countryByISO     = clients.GetCountry
+	countryByISO     = cachedGetCountry
 	countryByName    = clients.GetCountryByName
 	weatherFor       = clients.GetWeather
 	capitalCoordsFor = clients.GetCapitalCoordinates
