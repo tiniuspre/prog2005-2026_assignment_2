@@ -184,3 +184,28 @@ DELETE /envdash/v1/notifications/{id}     # Delete a notification
 
 GET    /envdash/v1/status/                # Get service and dependency health status
 ```
+
+---
+
+## Caching Strategy
+
+Country data from the REST Countries API is cached in Firestore with a 24-hour TTL.
+This is the only upstream response that is cached, for the following reasons:
+
+- **Country data is static** — population, area, capital, coordinates and currency codes
+  change rarely if ever. Caching for 24 hours introduces no meaningful data staleness.
+- **Weather data is not cached** — temperature and precipitation forecasts from Open-Meteo
+  are time-sensitive and must reflect current conditions on every dashboard retrieval.
+- **Air quality data is not cached** — PM2.5 and PM10 readings from OpenAQ represent live
+  sensor measurements. Caching these would defeat the purpose of the feature.
+- **Currency rates are not cached** — exchange rates fluctuate constantly and should always
+  reflect the latest available values.
+
+This approach maximises the reduction in outbound API traffic where it is safe to do so,
+while ensuring all time-sensitive data remains accurate on every request.
+
+Nominatim coordinate lookups are not cached. While capital city coordinates are static,
+Nominatim responses are fast and the service has no rate limit concerns at the scale
+of this application. Adding a separate cache collection for coordinates would introduce
+additional complexity without meaningful reduction in outbound traffic, since Nominatim
+is only called when air quality data is requested.
